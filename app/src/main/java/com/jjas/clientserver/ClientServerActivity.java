@@ -1,17 +1,27 @@
 package com.jjas.clientserver;
 
+import android.Manifest;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
+import android.util.Log;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import android.Manifest;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
+public class ClientServerActivity extends AppCompatActivity implements ServiceConnection, OnFragmentInteractionListener {
 
-public class ClientServerActivity extends AppCompatActivity {
+    public static final String TAG = "ClientServerActivity";
+    private Messenger networkService;
+    private boolean bound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,25 +29,6 @@ public class ClientServerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_client_server);
 
         requestPermissions();
-
-        Button bServer = findViewById(R.id.bServer);
-        bServer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ClientServerActivity.this, ServerActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        Button bClient = findViewById(R.id.bClient);
-        bClient.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ClientServerActivity.this, ClientActivity.class);
-                startActivity(intent);
-            }
-        });
-
     }
 
     private void requestPermissions() {
@@ -45,23 +36,50 @@ public class ClientServerActivity extends AppCompatActivity {
                 Manifest.permission.ACCESS_WIFI_STATE)
                 != PackageManager.PERMISSION_GRANTED) {
 
-            // Permission is not granted
-            // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.READ_CONTACTS)) {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
             } else {
                 // No explanation needed; request the permission
                 ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.INTERNET},
+                        new String[]{Manifest.permission.ACCESS_NETWORK_STATE,
+                                Manifest.permission.ACCESS_WIFI_STATE,
+                                Manifest.permission.INTERNET},
                         1001);
-
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
             }
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        bindService(new Intent(this, NetworkService.class),
+                this, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unbindService(this);
+    }
+
+    @Override
+    public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+        networkService = new Messenger(iBinder);
+        bound = true;
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName componentName) {
+        networkService = null;
+        bound = false;
+    }
+
+    @Override
+    public void networkServiceRequest(int request, String args) {
+        try {
+            if(bound) networkService.send(Message.obtain(null, request, 0, 0));
+        } catch (RemoteException e) {
+            Log.e(TAG, "Error sending request to network service.", e);
         }
     }
 }
