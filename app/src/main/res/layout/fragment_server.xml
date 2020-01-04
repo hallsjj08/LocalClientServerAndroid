@@ -16,7 +16,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Host IP Address: 192.0.4.6" />
+        tools:text="Server IP Address: 192.0.4.6" />
 
     <TextView
         android:id="@+id/tvClientInfo"

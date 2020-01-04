@@ -3,4 +3,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="enterName">Name:</string>
+    <string name="nameHint">Example: John Doe</string>
+    <string name="enterDob">Date of Birth:</string>
 </resources>
