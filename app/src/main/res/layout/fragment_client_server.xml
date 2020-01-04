@@ -11,49 +11,65 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:text="Select to be a client or server."
+        android:text="@string/optionMessage"
         android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/etIpAddress"
+        app:layout_constraintBottom_toTopOf="@+id/bClient"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/bClient"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/bClient"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintTop_toBottomOf="@id/tvDescription"
+        app:layout_constraintEnd_toStartOf="@+id/bServer"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/bServer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/bServer"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="@id/bClient"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvDescription"
+        app:layout_constraintStart_toEndOf="@id/bClient"/>
 
     <EditText
         android:id="@+id/etIpAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:hint="Host IP Address (for client)"
-        app:layout_constraintBottom_toTopOf="@+id/bClient"
+        android:visibility="invisible"
+        android:tooltipText="@string/etIpHint"
+        android:hint="@string/etIpHint"
+        app:layout_constraintBottom_toTopOf="@id/bConnect"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvDescription" />
+        app:layout_constraintTop_toBottomOf="@+id/bClient" />
 
     <Button
-        android:id="@+id/bServer"
-        android:layout_width="0dp"
+        android:id="@+id/bConnect"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Server"
+        android:text="@string/bConnect"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@id/bClient"/>
+        app:layout_constraintTop_toBottomOf="@id/etIpAddress"
+        app:layout_constraintStart_toStartOf="parent"/>
 
-    <Button
-        android:id="@+id/bClient"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Client"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/bServer"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

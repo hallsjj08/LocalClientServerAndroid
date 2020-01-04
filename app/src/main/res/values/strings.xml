@@ -6,4 +6,9 @@
     <string name="enterName">Name:</string>
     <string name="nameHint">Example: John Doe</string>
     <string name="enterDob">Date of Birth:</string>
+    <string name="etIpHint">Enter Server\'s IP address</string>
+    <string name="bConnect">Connect to Server</string>
+    <string name="bServer">Server</string>
+    <string name="bClient">Client</string>
+    <string name="optionMessage">Select to be Client or Server :</string>
 </resources>

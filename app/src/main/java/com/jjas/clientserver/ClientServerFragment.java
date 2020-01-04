@@ -10,6 +10,7 @@ import android.widget.EditText;
 public class ClientServerFragment extends BaseFragment {
 
     private EditText etIpAddress;
+    private Button bConnect;
 
     public ClientServerFragment() {
         // Required empty public constructor
@@ -26,6 +27,7 @@ public class ClientServerFragment extends BaseFragment {
         View v = inflater.inflate(R.layout.fragment_client_server, container, false);
 
         etIpAddress = v.findViewById(R.id.etIpAddress);
+        bConnect = v.findViewById(R.id.bConnect);
 
         Button bServer = v.findViewById(R.id.bServer);
         bServer.setOnClickListener(new View.OnClickListener() {
@@ -39,7 +41,22 @@ public class ClientServerFragment extends BaseFragment {
         bClient.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.networkServiceRequest(IncomingRequestHandler.CONNECT_TO_HOST, etIpAddress.getText().toString());
+                etIpAddress.setVisibility(View.VISIBLE);
+                bConnect.setVisibility(View.VISIBLE);
+            }
+        });
+
+        Button bConnect = v.findViewById(R.id.bConnect);
+        bConnect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String ipAddr = etIpAddress.getText().toString();
+                String regex = "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$";
+                if(!ipAddr.isEmpty() && ipAddr.matches(regex)) {
+                    listener.networkServiceRequest(IncomingRequestHandler.CONNECT_TO_HOST, ipAddr);
+                } else {
+                    etIpAddress.setError("IP address should be of the format 192.168.5.3");
+                }
             }
         });
 
