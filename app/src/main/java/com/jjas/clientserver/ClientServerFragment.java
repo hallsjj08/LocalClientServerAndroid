@@ -31,7 +31,7 @@ public class ClientServerFragment extends BaseFragment {
         bServer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.networkServiceRequest(NetworkService.SETUP_HOST_SERVER, null);
+                listener.networkServiceRequest(IncomingRequestHandler.SETUP_HOST_SERVER, null);
             }
         });
 
@@ -39,7 +39,7 @@ public class ClientServerFragment extends BaseFragment {
         bClient.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.networkServiceRequest(NetworkService.CONNECT_TO_HOST, etIpAddress.getText().toString());
+                listener.networkServiceRequest(IncomingRequestHandler.CONNECT_TO_HOST, etIpAddress.getText().toString());
             }
         });
 

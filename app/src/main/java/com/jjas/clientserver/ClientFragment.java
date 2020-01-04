@@ -34,7 +34,7 @@ public class ClientFragment extends BaseFragment {
         bSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.networkServiceRequest(NetworkService.SEND_DATA_TO_HOST, "Data");
+                listener.networkServiceRequest(IncomingRequestHandler.SEND_DATA_TO_HOST, "Data");
             }
         });
 
@@ -42,7 +42,7 @@ public class ClientFragment extends BaseFragment {
         bDisconnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listener.networkServiceRequest(NetworkService.DISCONNECT_FROM_HOST, null);
+                listener.networkServiceRequest(IncomingRequestHandler.DISCONNECT_FROM_HOST, null);
             }
         });
 

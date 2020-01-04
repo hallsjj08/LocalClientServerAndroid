@@ -79,13 +79,14 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     @Override
     public void networkServiceRequest(int request, String args) {
+        Log.d(TAG, "Network Request: " + request);
         try {
             switch (request) {
-                case NetworkService.SETUP_HOST_SERVER:
+                case IncomingRequestHandler.SETUP_HOST_SERVER:
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragmentContainer, ServerFragment.newInstance()).commit();
                     break;
-                case NetworkService.CONNECT_TO_HOST:
+                case IncomingRequestHandler.CONNECT_TO_HOST:
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragmentContainer, ClientFragment.newInstance()).commit();
                     break;
