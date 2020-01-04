@@ -33,7 +33,8 @@ public class ServerFragment extends BaseFragment {
         tvIP = v.findViewById(R.id.tvIpAddress);
         tvInfo = v.findViewById(R.id.tvClientInfo);
 
-        tvIP.setText(getIpAddress());
+        String ipMessage = "Server IP Address: " + getIpAddress();
+        tvIP.setText(ipMessage);
         tvInfo.setText("Waiting on client info...");
 
         return v;

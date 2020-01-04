@@ -11,4 +11,5 @@
     <string name="bServer">Server</string>
     <string name="bClient">Client</string>
     <string name="optionMessage">Select to be Client or Server :</string>
+    <string name="connectInfo">Connected to Server</string>
 </resources>
