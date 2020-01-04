@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -11,26 +12,25 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.os.StrictMode;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-public class MainActivity extends AppCompatActivity implements ServiceConnection, OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements ServiceConnection,
+        OnFragmentInteractionListener, NetworkServiceUpdates {
 
     public static final String TAG = "MainActivity";
     private Messenger networkService;
     private boolean bound;
+    private ServerFragment serverFragment;
+    private NetworkUpdateReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
 
         requestPermissions();
 
@@ -59,6 +59,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     @Override
     protected void onStart() {
         super.onStart();
+        receiver = new NetworkUpdateReceiver(this);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("data_received");
+        registerReceiver(receiver, filter);
         bindService(new Intent(this, NetworkService.class),
                 this, Context.BIND_AUTO_CREATE);
     }
@@ -67,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     protected void onStop() {
         super.onStop();
         unbindService(this);
+        unregisterReceiver(receiver);
     }
 
     @Override
@@ -87,8 +92,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         try {
             switch (request) {
                 case IncomingRequestHandler.SETUP_HOST_SERVER:
+                    serverFragment = ServerFragment.newInstance();
                     getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.fragmentContainer, ServerFragment.newInstance()).commit();
+                            .replace(R.id.fragmentContainer, serverFragment).commit();
                     break;
                 case IncomingRequestHandler.CONNECT_TO_HOST:
                     getSupportFragmentManager().beginTransaction()
@@ -108,5 +114,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         } catch (RemoteException e) {
             Log.e(TAG, "Error sending request to network service.", e);
         }
+    }
+
+    @Override
+    public void onMessageReceived(String message) {
+        serverFragment.clientInfoReceived(message);
     }
 }

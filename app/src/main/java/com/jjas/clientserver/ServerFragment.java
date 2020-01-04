@@ -3,21 +3,12 @@ package com.jjas.clientserver;
 
 import android.content.Context;
 import android.net.wifi.WifiManager;
-import android.net.wifi.p2p.WifiP2pManager;
-import android.nfc.Tag;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.Enumeration;
 import java.util.Locale;
 
 public class ServerFragment extends BaseFragment {

@@ -9,6 +9,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -16,6 +17,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.text.DateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 public class IncomingRequestHandler extends Handler {
 
@@ -66,7 +70,10 @@ public class IncomingRequestHandler extends Handler {
         }
     }
 
-    private void sendBroadcast(Intent intent) {
+    private void sendBroadcast(String message) {
+        Intent intent = new Intent();
+        intent.setAction("data_received");
+        intent.putExtra("message", message);
         context.sendBroadcast(intent);
     }
 
@@ -82,13 +89,9 @@ public class IncomingRequestHandler extends Handler {
                 //convert ObjectInputStream object to String
                 String message = ois.readUTF();
                 Log.d(TAG, "Message Received: " + message);
-                //create ObjectOutputStream object
-                oos = new ObjectOutputStream(socket.getOutputStream());
-                //write object to Socket
-                oos.writeObject("Success: "+message);
+                sendBroadcast(formatDisplayData(message));
                 //close resources
                 ois.close();
-                oos.close();
             } catch (IOException e) {
                 Log.e(TAG, "Error setting up host.", e);
             } finally {
@@ -139,5 +142,56 @@ public class IncomingRequestHandler extends Handler {
         } catch (IOException e) {
             Log.e(TAG, "Error sending info to server.", e);
         }
+    }
+
+    public String formatDisplayData(String message) {
+
+        String name = "";
+        int dayOfMonth = 1;
+        int month = 1;
+        int year = 2020;
+
+        try{
+            JSONObject jsonObject = new JSONObject(message);
+            name = jsonObject.getString(ClientFragment.NAME);
+            dayOfMonth = jsonObject.getInt(ClientFragment.DOB_DAY);
+            month = jsonObject.getInt(ClientFragment.DOB_MONTH);
+            year = jsonObject.getInt(ClientFragment.DOB_YEAR);
+        } catch (JSONException e) {
+            Log.e(TAG, "Incorrect data format.", e);
+        }
+
+        Calendar dob = Calendar.getInstance();
+        DateFormat dateFormat = DateFormat.getDateInstance();
+        dob.set(year, month, dayOfMonth);
+        int age = getAge(dob);
+
+        return String.format(Locale.getDefault(),"Name: %s \nDOB: %s \nAge: %d",
+                name, dateFormat.format(dob.getTime()), age);
+    }
+
+    public int getAge(Calendar dob) {
+
+        Calendar now = Calendar.getInstance();
+        if (dob.after(now)) {
+            Log.e(TAG, "Cannot be born in the future.");
+            return 0;
+        }
+        int year1 = now.get(Calendar.YEAR);
+        int year2 = dob.get(Calendar.YEAR);
+        int age = year1 - year2;
+        int month1 = now.get(Calendar.MONTH);
+        int month2 = dob.get(Calendar.MONTH);
+        if (month2 > month1) {
+            age--;
+        } else if (month1 == month2) {
+            int day1 = now.get(Calendar.DAY_OF_MONTH);
+            int day2 = dob.get(Calendar.DAY_OF_MONTH);
+            if (day2 > day1) {
+                age--;
+            }
+        }
+
+        return age;
     }
 }

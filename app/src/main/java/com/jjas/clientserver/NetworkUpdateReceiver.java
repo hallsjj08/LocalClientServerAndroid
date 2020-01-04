@@ -6,12 +6,16 @@ import android.content.Intent;
 
 public class NetworkUpdateReceiver extends BroadcastReceiver {
 
-    public NetworkUpdateReceiver() {
+    NetworkServiceUpdates updates;
 
+    public NetworkUpdateReceiver(NetworkServiceUpdates updates) {
+        this.updates = updates;
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-
+        if(intent.getAction().equals("data_received")) {
+            updates.onMessageReceived(intent.getStringExtra("message"));
+        }
     }
 }

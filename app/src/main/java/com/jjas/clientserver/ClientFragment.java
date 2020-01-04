@@ -17,6 +17,11 @@ public class ClientFragment extends BaseFragment {
 
     public static final String TAG = "ClientFragment";
 
+    public static final String NAME = "name";
+    public static final String DOB_DAY = "day";
+    public static final String DOB_MONTH = "month";
+    public static final String DOB_YEAR = "year";
+
     private EditText etName;
     private DatePicker date;
 
@@ -61,7 +66,11 @@ public class ClientFragment extends BaseFragment {
 
         try {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("name", etName.getText().toString());
+            jsonObject.put(NAME, etName.getText().toString());
+            jsonObject.put(DOB_DAY, date.getDayOfMonth());
+            jsonObject.put(DOB_MONTH, date.getMonth());
+            jsonObject.put(DOB_YEAR, date.getYear());
+            data = jsonObject.toString();
         } catch (JSONException e) {
             Log.e(TAG, "Error converting data to json string.", e);
         }
