@@ -2,6 +2,7 @@ package com.jjas.clientserver;
 
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +10,12 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class ClientFragment extends BaseFragment {
+
+    public static final String TAG = "ClientFragment";
 
     private EditText etName;
     private DatePicker date;
@@ -34,7 +40,7 @@ public class ClientFragment extends BaseFragment {
         bSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.networkServiceRequest(IncomingRequestHandler.SEND_DATA_TO_HOST, "Data");
+                listener.networkServiceRequest(IncomingRequestHandler.SEND_DATA_TO_HOST, converDataToJsonString());
             }
         });
 
@@ -47,6 +53,20 @@ public class ClientFragment extends BaseFragment {
         });
 
         return v;
+    }
+
+    private String converDataToJsonString() {
+
+        String data = "Error converting data";
+
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("name", etName.getText().toString());
+        } catch (JSONException e) {
+            Log.e(TAG, "Error converting data to json string.", e);
+        }
+
+        return data;
     }
 
 }

@@ -11,6 +11,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.os.StrictMode;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +28,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
 
         requestPermissions();
 
@@ -96,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             if(bound) {
                 if(args != null) {
                     Bundle bundle = new Bundle();
-                    bundle.putString("EXTRA_MSG_DATA", args);
+                    bundle.putString(IncomingRequestHandler.EXTRA_MSG_DATA, args);
                     msg.setData(bundle);
                 }
                 networkService.send(msg);

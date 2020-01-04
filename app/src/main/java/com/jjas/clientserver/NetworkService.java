@@ -37,4 +37,9 @@ public class NetworkService extends Service {
         return messenger.getBinder();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        handlerThread.quitSafely();
+    }
 }

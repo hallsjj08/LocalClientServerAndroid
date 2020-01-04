@@ -1,12 +1,15 @@
 package com.jjas.clientserver;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -17,6 +20,7 @@ import java.net.Socket;
 public class IncomingRequestHandler extends Handler {
 
     public static final String TAG = "IncomingRequestHandler";
+    public static final String EXTRA_MSG_DATA = "msg_data";
     public static final int SETUP_HOST_SERVER = 0;
     public static final int CONNECT_TO_HOST = 1;
     public static final int SEND_DATA_TO_HOST = 2;
@@ -41,15 +45,19 @@ public class IncomingRequestHandler extends Handler {
     public void handleMessage(@NonNull Message msg) {
         switch (msg.what) {
             case SETUP_HOST_SERVER:
+                setupServer();
                 Log.d(TAG, "Setting up as host.");
                 break;
             case CONNECT_TO_HOST:
+                setupHostConnection(msg.getData().getString(EXTRA_MSG_DATA));
                 Log.d(TAG, "Connecting client to host.");
                 break;
             case SEND_DATA_TO_HOST:
+                sendDataToHost(msg.getData().getString(EXTRA_MSG_DATA));
                 Log.d(TAG, "Sending data to host.");
                 break;
             case DISCONNECT_FROM_HOST:
+                disconnectFromHost();
                 Log.d(TAG, "Disconnecting from host.");
                 break;
             default:
@@ -58,33 +66,34 @@ public class IncomingRequestHandler extends Handler {
         }
     }
 
+    private void sendBroadcast(Intent intent) {
+        context.sendBroadcast(intent);
+    }
 
-    private void setupServer(Handler handler) throws IOException {
-        serverSocket = new ServerSocket(PORT_NUMBER);
-        //keep listens indefinitely until receives 'exit' call or program terminates
-        while(true){
-            Log.d(TAG, "Waiting for the client request");
-            //creating socket and waiting for client connection
-            socket = serverSocket.accept();
-            //read from socket to ObjectInputStream object
-            ois = new ObjectInputStream(socket.getInputStream());
-            //convert ObjectInputStream object to String
-            String message = ois.readUTF();
-            Log.d(TAG, "Message Received: " + message);
-            //create ObjectOutputStream object
-            oos = new ObjectOutputStream(socket.getOutputStream());
-            //write object to Socket
-            oos.writeObject("Success: "+message);
-            //close resources
-            ois.close();
-            oos.close();
-            socket.close();
-            //terminate the server if client sends exit request
-//            if(message.equalsIgnoreCase(DISSCONNECT)) break;
-        }
-//        Log.d(TAG, "Shutting down Socket server!!");
-        //close the ServerSocket object
-//        serverSocket.close();
+
+    private void setupServer() {
+            try {
+                serverSocket = new ServerSocket(PORT_NUMBER);
+                Log.d(TAG, "Waiting for the client request");
+                //creating socket and waiting for client connection
+                socket = serverSocket.accept();
+                //read from socket to ObjectInputStream object
+                ois = new ObjectInputStream(socket.getInputStream());
+                //convert ObjectInputStream object to String
+                String message = ois.readUTF();
+                Log.d(TAG, "Message Received: " + message);
+                //create ObjectOutputStream object
+                oos = new ObjectOutputStream(socket.getOutputStream());
+                //write object to Socket
+                oos.writeObject("Success: "+message);
+                //close resources
+                ois.close();
+                oos.close();
+            } catch (IOException e) {
+                Log.e(TAG, "Error setting up host.", e);
+            } finally {
+                cleanup();
+            }
     }
 
     private void cleanup() {
@@ -109,24 +118,26 @@ public class IncomingRequestHandler extends Handler {
         }
     }
 
-    private void setupHostConnection(String ipAddress, String name) throws IOException {
+    private void setupHostConnection(String ipAddress) {
+        if(socket == null) {
+            try {
+                socket = new Socket(ipAddress, PORT_NUMBER);
+            } catch (IOException e) {
+                Log.e(TAG, "Error connecting to host.", e);
+            }
+        }
+    }
 
-        if(socket == null) socket = new Socket(ipAddress, PORT_NUMBER);
-
-        try (ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream())){
+    private void sendDataToHost(String data) {
+        if(socket == null) return;
+        try (ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream())){
             //write to socket using ObjectOutputStream
 
-            oos.writeUTF(name);
+            oos.writeUTF(data);
             Log.d(TAG, "Sending request to Socket Server");
             //read the server response message
-
-            String message = ois.readUTF();
-            Log.d(TAG, "Message: " + message);
         } catch (IOException e) {
             Log.e(TAG, "Error sending info to server.", e);
-            throw e;
         }
-
     }
 }

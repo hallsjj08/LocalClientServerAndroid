@@ -1,7 +1,12 @@
 package com.jjas.clientserver;
 
 
+import android.content.Context;
+import android.net.wifi.WifiManager;
+import android.net.wifi.p2p.WifiP2pManager;
+import android.nfc.Tag;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,10 +16,13 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
+import java.util.Locale;
 
 public class ServerFragment extends BaseFragment {
 
+    public static final String TAG = "ServerFragment";
     private TextView tvIP;
     private TextView tvInfo;
 
@@ -41,20 +49,12 @@ public class ServerFragment extends BaseFragment {
     }
 
     private String getIpAddress() {
-        try {
-            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
-                NetworkInterface intf = en.nextElement();
-                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
-                    InetAddress inetAddress = enumIpAddr.nextElement();
-                    if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
-                        return inetAddress.getHostAddress();
-                    }
-                }
-            }
-        } catch (SocketException ex) {
-            ex.printStackTrace();
-        }
-        return null;
+        WifiManager wifiManager = (WifiManager) getContext().getSystemService(Context.WIFI_SERVICE);
+        int address = wifiManager.getConnectionInfo().getIpAddress();
+
+        return String.format(Locale.getDefault(), "%d.%d.%d.%d",
+                (address & 0xff), (address >> 8 & 0xff),
+                (address >> 16 & 0xff), (address >> 24 & 0xff));
     }
 
     public void clientInfoReceived(String info) {
