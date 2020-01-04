@@ -17,18 +17,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-public class ClientServerActivity extends AppCompatActivity implements ServiceConnection, OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements ServiceConnection, OnFragmentInteractionListener {
 
-    public static final String TAG = "ClientServerActivity";
+    public static final String TAG = "MainActivity";
     private Messenger networkService;
     private boolean bound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_client_server);
+        setContentView(R.layout.activity_main);
 
         requestPermissions();
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
+                ClientServerFragment.newInstance()).commit();
     }
 
     private void requestPermissions() {
@@ -77,7 +80,26 @@ public class ClientServerActivity extends AppCompatActivity implements ServiceCo
     @Override
     public void networkServiceRequest(int request, String args) {
         try {
-            if(bound) networkService.send(Message.obtain(null, request, 0, 0));
+            switch (request) {
+                case NetworkService.SETUP_HOST_SERVER:
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragmentContainer, ServerFragment.newInstance()).commit();
+                    break;
+                case NetworkService.CONNECT_TO_HOST:
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragmentContainer, ClientFragment.newInstance()).commit();
+                    break;
+            }
+
+            Message msg = Message.obtain(null, request, 0, 0);
+            if(bound) {
+                if(args != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("EXTRA_MSG_DATA", args);
+                    msg.setData(bundle);
+                }
+                networkService.send(msg);
+            }
         } catch (RemoteException e) {
             Log.e(TAG, "Error sending request to network service.", e);
         }

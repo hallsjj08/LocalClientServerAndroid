@@ -18,7 +18,7 @@ public class ClientFragment extends BaseFragment {
         // Required empty public constructor
     }
 
-    public static ClientFragment newInstance(String param1, String param2) {
+    public static ClientFragment newInstance() {
         return new ClientFragment();
     }
 
